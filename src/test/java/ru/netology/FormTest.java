@@ -12,8 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FormTest {
     private WebDriver driver;
@@ -104,6 +103,7 @@ class FormTest {
         form.findElement(By.className("button_view_extra")).click();
 
         assertThrows(NoSuchElementException.class, () -> driver.findElement(By.cssSelector("[data-test-id=order-success]")).getText());
+        assertTrue(driver.findElement(By.cssSelector("[data-test-id=agreement].input_invalid")).isDisplayed());
     }
 
     @Test
@@ -155,7 +155,7 @@ class FormTest {
     }
 
     @Test
-    public void telephoneShouldBe11More() {
+    public void telephoneShouldNotBe11More() {
         WebElement form = driver.findElement(By.className("form"));
         form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Кирилл");
         form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79270000000000000");
@@ -168,7 +168,7 @@ class FormTest {
     }
 
     @Test
-    public void telephoneShouldBe11Less() {
+    public void telephoneShouldNotBe11Less() {
         WebElement form = driver.findElement(By.className("form"));
         form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Кирилл");
         form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79270");
@@ -189,29 +189,6 @@ class FormTest {
 
         String actName = driver.findElement(By.cssSelector("[data-test-id=phone].input_invalid .input__sub")).getText();
         String expName = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
-
-        assertEquals(expName, actName);
-    }
-
-    @Test
-    public void shouldNotSuccessWithNoData() {
-        WebElement form = driver.findElement(By.className("form"));
-        form.findElement(By.className("button_view_extra")).click();
-
-        String actName = driver.findElement(By.cssSelector("[data-test-id=name].input_invalid .input__sub")).getText();
-        String expName = "Поле обязательно для заполнения";
-
-        assertEquals(expName, actName);
-    }
-
-    @Test
-    public void shouldNotSuccessWithFirstFilled() {
-        WebElement form = driver.findElement(By.className("form"));
-        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Кирилл");
-        form.findElement(By.className("button_view_extra")).click();
-
-        String actName = driver.findElement(By.cssSelector("[data-test-id=phone].input_invalid .input__sub")).getText();
-        String expName = "Поле обязательно для заполнения";
 
         assertEquals(expName, actName);
     }
@@ -297,6 +274,55 @@ class FormTest {
 
         String actName = driver.findElement(By.cssSelector("[data-test-id=phone].input_invalid .input__sub")).getText();
         String expName = "Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.";
+
+        assertEquals(expName, actName);
+    }
+
+    @Test
+    public void shouldNotSuccessWithEmptyName() {
+        WebElement form = driver.findElement(By.className("form"));
+        form.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+89635452462");
+        form.findElement(By.cssSelector("[data-test-id=agreement]")).click();
+        form.findElement(By.className("button_view_extra")).click();
+
+        String actName = driver.findElement(By.cssSelector("[data-test-id=name].input_invalid .input__sub")).getText();
+        String expName = "Поле обязательно для заполнения";
+
+        assertEquals(expName, actName);
+    }
+
+    @Test
+    public void shouldNotSuccessWithEmptyPhone() {
+        WebElement form = driver.findElement(By.className("form"));
+        form.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Кирилл");
+        form.findElement(By.cssSelector("[data-test-id=agreement]")).click();
+        form.findElement(By.className("button_view_extra")).click();
+
+        String actName = driver.findElement(By.cssSelector("[data-test-id=phone].input_invalid .input__sub")).getText();
+        String expName = "Поле обязательно для заполнения";
+
+        assertEquals(expName, actName);
+    }
+
+    @Test
+    public void shouldNotSuccessWithNoDataButAgreementValid() {
+        WebElement form = driver.findElement(By.className("form"));
+        form.findElement(By.cssSelector("[data-test-id=agreement]")).click();
+        form.findElement(By.className("button_view_extra")).click();
+
+        String actName = driver.findElement(By.cssSelector("[data-test-id=name].input_invalid .input__sub")).getText();
+        String expName = "Поле обязательно для заполнения";
+
+        assertEquals(expName, actName);
+    }
+
+    @Test
+    public void shouldNotSuccessWithNoData() {
+        WebElement form = driver.findElement(By.className("form"));
+        form.findElement(By.className("button_view_extra")).click();
+
+        String actName = driver.findElement(By.cssSelector("[data-test-id=name].input_invalid .input__sub")).getText();
+        String expName = "Поле обязательно для заполнения";
 
         assertEquals(expName, actName);
     }
